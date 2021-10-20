@@ -867,6 +867,7 @@ class RedshiftDialectMixin(object):
                null AS "distkey",
                0 AS "sortkey",
                null AS "notnull",
+               null as "comment",
                null AS "adsrc",
                null AS "attnum",
                CASE
@@ -881,6 +882,7 @@ class RedshiftDialectMixin(object):
                null AS "schema_oid",
                null AS "table_oid"
             FROM svv_external_columns
+            WHERE 1 {schema_clause}
             ORDER BY "schema", "table_name", "attnum";
             """.format(schema_clause=schema_clause)
             )
