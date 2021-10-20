@@ -864,12 +864,12 @@ class RedshiftDialectMixin(object):
                     'varchar', 'character varying')
                  END
                     AS "type",
-               null AS "distkey",
+               false AS "distkey",
                0 AS "sortkey",
                null AS "notnull",
                null as "comment",
                null AS "adsrc",
-               null AS "attnum",
+               columnnum AS "attnum",
                CASE
                  WHEN external_type = 'int' THEN 'integer'
                  ELSE
