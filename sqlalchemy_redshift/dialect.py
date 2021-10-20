@@ -850,17 +850,17 @@ class RedshiftDialectMixin(object):
               col_num int)
             WHERE 1 {schema_clause}
             UNION
-            SELECT schemaname AS "schema",
-               tablename AS "table_name",
-               columnname AS "name",
+            SELECT c.schemaname AS "schema",
+               c.tablename AS "table_name",
+               c.columnname AS "name",
                null AS "encode",
                -- Spectrum represents data types differently.
                -- Standardize, so we can infer types.
                CASE
-                 WHEN external_type = 'int' THEN 'integer'
+                 WHEN c.external_type = 'int' THEN 'integer'
                  ELSE
                    replace(
-                    replace(external_type, 'decimal', 'numeric'),
+                    replace(c.external_type, 'decimal', 'numeric'),
                     'varchar', 'character varying')
                  END
                     AS "type",
@@ -869,19 +869,20 @@ class RedshiftDialectMixin(object):
                null AS "notnull",
                null as "comment",
                null AS "adsrc",
-               columnnum AS "attnum",
+               c.columnnum AS "attnum",
                CASE
-                 WHEN external_type = 'int' THEN 'integer'
+                 WHEN c.external_type = 'int' THEN 'integer'
                  ELSE
                    replace(
-                    replace(external_type, 'decimal', 'numeric'),
+                    replace(c.external_type, 'decimal', 'numeric'),
                     'varchar', 'character varying')
                  END
                     AS "format_type",
                null AS "default",
-               null AS "schema_oid",
+               s.esoid AS "schema_oid",
                null AS "table_oid"
-            FROM svv_external_columns
+            FROM svv_external_columns c
+            JOIN svv_external_schemas s ON s.schemaname = c.schemaname
             WHERE 1 {schema_clause}
             ORDER BY "schema", "table_name", "attnum";
             """.format(schema_clause=schema_clause)
